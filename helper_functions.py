@@ -1,3 +1,4 @@
+from Bio import substitution_matrices
 def global_alignment(seq1, seq2, scoring_function):
     """Global sequence alignment using the Needleman–Wunsch algorithm.
 
@@ -28,6 +29,38 @@ def global_alignment(seq1, seq2, scoring_function):
     Other alignments are not possible.
 
     """
+    # 2 matrices to keep track of functions
+    alignment_matrix = [[0 for _ in range(len(seq1) + 1)] for _ in range(len(seq2) + 1)]
+    pointer_matrix = [[None for _ in range(len(seq1) + 1)] for _ in range(len(seq2) + 1)]
+
+    # Initialising matrices with gap penalties (assuming 1)
+    for j in range(1, len(seq1) + 1):
+        alignment_matrix[0][j] = j * - 1
+        pointer_matrix[0][j] = (0, j - 1)
+    for i in range(1, len(seq2) + 1):
+        alignment_matrix[i][0] = i * -1
+        pointer_matrix[i][0] = (i - 1, 0)
+
+    # Building alignment score and pointer matrices based on Needleman-Wunsch calculations
+    for i in range(2, len(seq2) + 1):
+        for j in range(2, len(seq1) + 1):
+            alignment_matrix[i][j] = max(
+                (alignment_matrix[i - 1][j - 1] + scoring_function(seq1[j - 1], seq2[i - 1])), 
+                (alignment_matrix[i - 1][j] - 1),
+                (alignment_matrix[i][j - 1] - 1))
+            
+            if alignment_matrix[i][j] == (alignment_matrix[i - 1][j - 1] + scoring_function(seq1[j - 1], seq2[i - 1])):
+                pointer_matrix[i][j] = (i - 1, j - 1)
+            elif alignment_matrix[i][j] == (alignment_matrix[i - 1][j] - 1):
+                pointer_matrix[i][j] = (i - 1, j)
+            elif alignment_matrix[i][j] == (alignment_matrix[i][j - 1] - 1):
+                pointer_matrix[i][j] = (i, j - 1)
+
+    # NEED TO IMPLEMENT: 
+    # - Traceback + building final aligned sequences
+    # - Final alignment score
+
+         
     raise NotImplementedError()
 
 
@@ -64,7 +97,8 @@ def local_alignment(seq1, seq2, scoring_function):
     raise NotImplementedError()
 
 
-## This is an example scoring function, you should implement a version which uses a scoring matrix 
-def scoring_function_simple(aa_i,aa_j):
-    score = [-1, 1][aa_i == aa_j]
+## Scoring Function using BLOSUM62
+def scoring_function(aa_i,aa_j):
+    blosum_62 = substitution_matrices.load("BLOSUM62")
+    score = blosum_62[aa_i][aa_j]
     return (score)

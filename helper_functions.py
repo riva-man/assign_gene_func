@@ -1,4 +1,4 @@
-from Bio import substitution_matrices
+from Bio.Align import substitution_matrices
 def global_alignment(seq1, seq2, scoring_function):
     """Global sequence alignment using the Needleman–Wunsch algorithm.
 
@@ -42,8 +42,8 @@ def global_alignment(seq1, seq2, scoring_function):
         pointer_matrix[i][0] = (i - 1, 0)
 
     # Building alignment score and pointer matrices based on Needleman-Wunsch calculations
-    for i in range(2, len(seq2) + 1):
-        for j in range(2, len(seq1) + 1):
+    for i in range(1, len(seq2) + 1):
+        for j in range(1, len(seq1) + 1):
             alignment_matrix[i][j] = max(
                 (alignment_matrix[i - 1][j - 1] + scoring_function(seq1[j - 1], seq2[i - 1])), 
                 (alignment_matrix[i - 1][j] - 1),
@@ -56,12 +56,36 @@ def global_alignment(seq1, seq2, scoring_function):
             elif alignment_matrix[i][j] == (alignment_matrix[i][j - 1] - 1):
                 pointer_matrix[i][j] = (i, j - 1)
 
-    # NEED TO IMPLEMENT: 
-    # - Traceback + building final aligned sequences
-    # - Final alignment score
 
+    # Traceback and calculating final score
+    i = len(seq2)
+    j = len(seq1)
+    traceback_seq1 = '' 
+    traceback_seq2 = ''
+    final_score = 0
+
+    while (i != 0 and j != 0):
+        final_score += alignment_matrix[i][j]
+
+        new_i, new_j = pointer_matrix[i][j]
+
+        if new_i == i - 1:
+            traceback_seq2 += seq2[i - 1]
+        elif new_i == i:
+            traceback_seq2 += '-'
+
+        if new_j == j - 1:
+            traceback_seq1 += seq1[j - 1]
+        elif new_j == j:
+            traceback_seq1 += '-'
+
+        i = new_i
+        j = new_j
+            
+    aligned_seq1 = traceback_seq1[::-1]
+    aligned_seq2 = traceback_seq2[::-1]
          
-    raise NotImplementedError()
+    return (aligned_seq1, aligned_seq2, final_score)
 
 
 def local_alignment(seq1, seq2, scoring_function):

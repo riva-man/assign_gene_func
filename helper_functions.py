@@ -2,6 +2,7 @@ from Bio.Align import substitution_matrices
 
 # global variables
 blosum_62 = substitution_matrices.load("BLOSUM62")
+gap_penalty = 8
 match = 0
 go_left = 1
 go_up = 2
@@ -42,18 +43,18 @@ def global_alignment(seq1, seq2, scoring_function):
 
     # Initialising matrices with gap penalties (assuming 1)
     for j in range(1, len(seq1) + 1):
-        alignment_matrix[0][j] = j * - 1
+        alignment_matrix[0][j] = j * - gap_penalty
         pointer_matrix[0][j] = 1
     for i in range(1, len(seq2) + 1):
-        alignment_matrix[i][0] = i * - 1
+        alignment_matrix[i][0] = i * - gap_penalty
         pointer_matrix[i][0] = 2
 
     # Building alignment score and pointer matrices based on Needleman-Wunsch calculations
     for i in range(1, len(seq2) + 1):
         for j in range(1, len(seq1) + 1):
             diagonal = alignment_matrix[i - 1][j - 1] + scoring_function(seq1[j - 1], seq2[i - 1])
-            left = alignment_matrix[i][j - 1] - 1
-            up = alignment_matrix[i - 1][j] - 1
+            left = alignment_matrix[i][j - 1] - gap_penalty
+            up = alignment_matrix[i - 1][j] - gap_penalty
             
             if diagonal >= left and diagonal >= up:
                 alignment_matrix[i][j] = diagonal

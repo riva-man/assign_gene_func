@@ -73,11 +73,9 @@ def global_alignment(seq1, seq2, scoring_function):
     j = len(seq1)
     traceback_seq1 = '' 
     traceback_seq2 = ''
-    final_score = 0
+    final_score = alignment_matrix[i][j]
     
     while (i != 0 or j != 0):
-        final_score += alignment_matrix[i][j]
-
         next = pointer_matrix[i][j]
 
         if next == match:
@@ -169,11 +167,8 @@ def local_alignment(seq1, seq2, scoring_function):
     i, j = max_coord
     traceback_seq1 = '' 
     traceback_seq2 = ''
-    final_score = 0
     
     while (alignment_matrix[i][j] != 0):
-        final_score += alignment_matrix[i][j]
-
         next = pointer_matrix[i][j]
 
         if next == match:
@@ -196,7 +191,7 @@ def local_alignment(seq1, seq2, scoring_function):
     aligned_seq1 = traceback_seq1[::-1]
     aligned_seq2 = traceback_seq2[::-1]
             
-    return (aligned_seq1, aligned_seq2, final_score)
+    return (aligned_seq1, aligned_seq2, max_score)
 
 
 ## Scoring Function using BLOSUM62

@@ -43,10 +43,10 @@ def global_alignment(seq1, seq2, scoring_function):
 
     # Initialising matrices with gap penalties
     for j in range(1, len(seq1) + 1):
-        alignment_matrix[0][j] = j * - gap_penalty
+        alignment_matrix[0][j] = j * (-gap_penalty)
         pointer_matrix[0][j] = go_left
     for i in range(1, len(seq2) + 1):
-        alignment_matrix[i][0] = i * - gap_penalty
+        alignment_matrix[i][0] = i * (-gap_penalty)
         pointer_matrix[i][0] = go_up
 
     # Building alignment score and pointer matrices based on Needleman-Wunsch calculations
@@ -94,11 +94,22 @@ def global_alignment(seq1, seq2, scoring_function):
             traceback_seq2 += seq2[i - 1]
             i = i - 1
       
-            
+    if i == 0 and j > 0:
+        while j != 0:
+            traceback_seq1 += seq1[j - 1]
+            traceback_seq2 += '-'
+            j = j - 1
+
+    elif j == 0 and i > 0:
+        while i != 0:
+            traceback_seq1 += '-'
+            traceback_seq2 += seq2[i - 1]
+            i = i - 1
+    
     aligned_seq1 = traceback_seq1[::-1]
     aligned_seq2 = traceback_seq2[::-1]
          
-    return (aligned_seq1, aligned_seq2, final_score)
+    return (aligned_seq1, aligned_seq2, float(final_score))
 
 
 def local_alignment(seq1, seq2, scoring_function):
@@ -191,7 +202,7 @@ def local_alignment(seq1, seq2, scoring_function):
     aligned_seq1 = traceback_seq1[::-1]
     aligned_seq2 = traceback_seq2[::-1]
             
-    return (aligned_seq1, aligned_seq2, max_score)
+    return (aligned_seq1, aligned_seq2, float(max_score))
 
 
 ## Scoring Function using BLOSUM62
